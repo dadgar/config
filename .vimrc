@@ -26,11 +26,12 @@ Bundle 'dantler/vim-alternate'
 Bundle 'flazz/vim-colorschemes'
 Bundle 'Shougo/neocomplete.vim'
 Bundle 'vim-scripts/Figlet.vim'
-Bundle 'mileszs/ack.vim'
+Bundle 'rking/ag.vim'
 Bundle 'mhinz/vim-signify'
+Bundle 'tpope/vim-fugitive'
 Bundle 'Pychimp/vim-luna'
 Bundle 'kshenoy/vim-signature'
-Bundle 'jnwhiteh/vim-golang'
+Bundle 'fatih/vim-go'
 Bundle 'leshill/vim-json'
 Bundle 'moll/vim-bbye'
 
@@ -121,8 +122,12 @@ endif
 set history=10000
 set undolevels=1000
 
-" Ack
-let g:ackprg = 'ag --nogroup --nocolor --column'
+" Ag
+let g:ag_working_path_mode="r"
+
+" CtrlP
+let g:ctrlp_extensions = ['tag', 'buffertag', 'undo', 'changes']
+map <C-b> :CtrlPBuffer<Enter>
 
 " Airline
 set laststatus=2
@@ -130,11 +135,22 @@ let g:airline_theme='luna'
 let g:signify_mapping_toggle_highlight = '<leader>gh'
 let g:airline#extensions#tabline#enabled = 1
 
+" Signify
+nnoremap <leader>gt SignifyToggle
+nnoremap <leader>gh SignifyToggleHighlight
+nmap <leader>gj <plug>(signify-next-hunk)
+nmap <leader>gk <plug>(signify-prev-hunk)
+
+" vim-go
+let g:go_def_mapping_enabled = 1
+
 " Easy-align
 vnoremap <silent> <leader>a :EasyAlign<Enter>
 
 " TagBar
 nnoremap <silent> <leader>tt :TagbarToggle<CR>
+let g:tagbar_autoclose=1
+let g:tagbar_autofocus=1
 
 " Syntastic
 let g:syntastic_c_check_header = 1
@@ -151,7 +167,7 @@ let g:syntastic_python_flake8_args = '--ignore="E501,E302,E261,E701,E241,E126,E1
 map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 map <leader>e :NERDTreeFind<CR>
 nmap <leader>nt :NERDTreeFind<CR>
-let NERDTreeIgnore=['\.class', '\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeIgnore=['\.class', '\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.o']
 let NERDTreeQuitOnOpen=1
 
 " Cscope
@@ -260,5 +276,5 @@ set completeopt-=preview
 filetype plugin indent off
 set runtimepath+=$GOROOT/misc/vim
 filetype plugin indent on
-
-autocmd BufWritePre *.go Fmt " Auto format on saves
+let g:go_bin_path = expand("~/Projects/go/bin/")
+let g:go_fmt_command = "GoImports"
