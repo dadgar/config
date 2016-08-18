@@ -3,37 +3,43 @@ filetype off
 let mapleader=","
 set t_Co=256
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 
 " let Vundle manage Vundle
 " required!
-Bundle 'gmarik/vundle'
+Plugin 'VundleVim/Vundle.vim'
 
 " My Bundles
-Bundle 'scrooloose/nerdtree'
-Bundle 'majutsushi/tagbar'
-Bundle 'scrooloose/syntastic'
-Bundle 'bling/vim-airline'
-Bundle 'sjl/gundo.vim'
-Bundle 'scrooloose/nerdcommenter'
-Bundle "godlygeek/tabular"
-Bundle 'junegunn/vim-easy-align'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'justinmk/vim-sneak'
-Bundle 'kien/ctrlp.vim'
-Bundle 'dantler/vim-alternate'
-Bundle 'flazz/vim-colorschemes'
-Bundle 'Shougo/neocomplete.vim'
-Bundle 'vim-scripts/Figlet.vim'
-Bundle 'rking/ag.vim'
-Bundle 'mhinz/vim-signify'
-Bundle 'tpope/vim-fugitive'
-Bundle 'Pychimp/vim-luna'
-Bundle 'kshenoy/vim-signature'
-Bundle 'fatih/vim-go'
-Bundle 'leshill/vim-json'
-Bundle 'moll/vim-bbye'
+Plugin 'scrooloose/nerdtree'
+Plugin 'majutsushi/tagbar'
+Plugin 'scrooloose/syntastic'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'bling/vim-airline'
+Plugin 'sjl/gundo.vim'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'godlygeek/tabular'
+Plugin 'junegunn/vim-easy-align'
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'justinmk/vim-sneak'
+Plugin 'kien/ctrlp.vim'
+Plugin 'dantler/vim-alternate'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'Shougo/neocomplete.vim'
+Plugin 'vim-scripts/Figlet.vim'
+Plugin 'rking/ag.vim'
+Plugin 'mhinz/vim-signify'
+Plugin 'tpope/vim-fugitive'
+Plugin 'Pychimp/vim-luna'
+Plugin 'kshenoy/vim-signature'
+Plugin 'fatih/vim-go'
+Plugin 'leshill/vim-json'
+Plugin 'moll/vim-bbye'
+Plugin 'henrik/vim-indexed-search'
+"Plugin 'fatih/vim-hclfmt'
+
+call vundle#end()            " required
+filetype plugin indent on    " required
 
 if has("gui_running")
     colorscheme luna
@@ -57,10 +63,6 @@ set scrolloff=5 " Number of lines above or bellow the current line
 set hlsearch
 set incsearch
 set ignorecase
-
-" White space highlighting
-set list
-set listchars=tab:>.,trail:.,extends:#,nbsp:.
 
 "Indents
 set smartindent
@@ -105,8 +107,11 @@ set virtualedit=onemore    " Allow for cursor beyond last character
 imap jj <Esc>
 set wildmenu
 set wildignore+=*.o,*.so,*.swp,*.zip,*.class,*.pyc
-set autowriteall " Automatically writes when switching buffers 
+set autowriteall " Automatically writes when switching buffers
 set updatetime=4000
+set backspace=2
+set ttyfast
+set lazyredraw
 
 " Default to 2 spaces per tab
 set tabstop=4
@@ -127,7 +132,11 @@ let g:ag_working_path_mode="r"
 
 " CtrlP
 let g:ctrlp_extensions = ['tag', 'buffertag', 'undo', 'changes']
+map <C-p> :CtrlP<Enter>
 map <C-b> :CtrlPBuffer<Enter>
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]vendor$',
+  \ }
 
 " Airline
 set laststatus=2
@@ -136,13 +145,15 @@ let g:signify_mapping_toggle_highlight = '<leader>gh'
 let g:airline#extensions#tabline#enabled = 1
 
 " Signify
-nnoremap <leader>gt SignifyToggle
-nnoremap <leader>gh SignifyToggleHighlight
+nnoremap <leader>gt :SignifyToggle<CR>
+nnoremap <leader>gh :SignifyToggleHighlight<CR>
 nmap <leader>gj <plug>(signify-next-hunk)
 nmap <leader>gk <plug>(signify-prev-hunk)
 
 " vim-go
 let g:go_def_mapping_enabled = 1
+let g:go_fmt_command = "goimports"
+let g:go_list_type = "quickfix"
 
 " Easy-align
 vnoremap <silent> <leader>a :EasyAlign<Enter>
@@ -152,16 +163,27 @@ nnoremap <silent> <leader>tt :TagbarToggle<CR>
 let g:tagbar_autoclose=1
 let g:tagbar_autofocus=1
 
+" Index Search
+let g:indexed_search_colors=0
+
 " Syntastic
 let g:syntastic_c_check_header = 1
-let g:syntastic_c_compiler_options = '-std=gnu99 -fno-strict-aliasing 
-            \-Werror -Wall -Wno-missing-field-initializers 
-            \-Wmissing-declarations -Wmissing-prototypes -Wno-format-zero-length 
-            \-Wpointer-arith 
+let g:syntastic_c_compiler_options = '-std=gnu99 -fno-strict-aliasing
+            \-Werror -Wall -Wno-missing-field-initializers
+            \-Wmissing-declarations -Wmissing-prototypes -Wno-format-zero-length
+            \-Wpointer-arith
             \-Wstrict-prototypes -Wwrite-strings -Werror=unused-function'
 
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_python_flake8_args = '--ignore="E501,E302,E261,E701,E241,E126,E127,E128,W801"'
+let g:syntastic_go_checkers = ['go']
+" let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 0
+
 
 " NerdTree
 map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
@@ -276,5 +298,3 @@ set completeopt-=preview
 filetype plugin indent off
 set runtimepath+=$GOROOT/misc/vim
 filetype plugin indent on
-let g:go_bin_path = expand("~/Projects/go/bin/")
-let g:go_fmt_command = "GoImports"
