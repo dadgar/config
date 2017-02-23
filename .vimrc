@@ -38,11 +38,14 @@ Plugin 'zchee/deoplete-go', { 'do': 'make'}
 "Plugin 'fatih/vim-hclfmt'
 call vundle#end()            " required
 filetype plugin indent on    " required
-if has("gui_running")
-    colorscheme luna
-else
-    colorscheme luna-term
+
+" gui colors if running iTerm
+if $TERM_PROGRAM =~ "iTerm"
+  set termguicolors
 endif
+
+colorscheme luna
+
 " Disable arrows
 noremap <Up> <NOP>
 noremap <Down> <NOP>
@@ -87,6 +90,10 @@ set nowrap
 map <Leader>bn :bn<cr>
 map <Leader>bp :bp<cr>
 map <Leader>bd :Bdelete<cr>
+" List navigation
+map <Leader>ll :lfirst<cr>
+map <Leader>ln :lnext<cr>
+map <Leader>lp :lprevious<cr>
 " MISC
 set shortmess+=filmnrxoOtT " Abbreviate and avoid hit enter
 set virtualedit=onemore    " Allow for cursor beyond last character
