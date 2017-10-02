@@ -10,7 +10,6 @@ Plugin 'VundleVim/Vundle.vim'
 " My Bundles
 Plugin 'scrooloose/nerdtree'
 Plugin 'majutsushi/tagbar'
-Plugin 'scrooloose/syntastic'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'bling/vim-airline'
 Plugin 'sjl/gundo.vim'
@@ -21,7 +20,6 @@ Plugin 'Lokaltog/vim-easymotion'
 Plugin 'justinmk/vim-sneak'
 Plugin 'kien/ctrlp.vim'
 Plugin 'dantler/vim-alternate'
-Plugin 'Shougo/neocomplete.vim'
 Plugin 'vim-scripts/Figlet.vim'
 Plugin 'rking/ag.vim'
 Plugin 'mhinz/vim-signify'
@@ -38,6 +36,9 @@ Plugin 'shime/vim-livedown'
 Plugin 'junegunn/goyo.vim'
 Plugin 'fatih/vim-hclfmt'
 Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plugin 'Shougo/neosnippet'
+Plugin 'Shougo/neosnippet-snippets'
+Plugin 'neomake/neomake'
 
 " Colors
 Plugin 'ayu-theme/ayu-vim'
@@ -143,6 +144,7 @@ set undolevels=1000
 let g:ag_working_path_mode="r"
 
 " CtrlP
+set wildignore+=*/ui
 let g:ctrlp_extensions = ['tag', 'buffertag', 'undo', 'changes']
 map <C-p> :CtrlP<Enter>
 map <C-b> :CtrlPBuffer<Enter>
@@ -166,6 +168,30 @@ nmap <leader>gk <plug>(signify-prev-hunk)
 let g:go_def_mapping_enabled = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
+let g:go_snippet_engine = "neosnippet"
+let g:go_metalinter_deadline = "30s"
+let g:go_metalinter_command = 'gometalinter
+\ --vendor
+\ --exclude=".*\.generated\.go"
+\ --exclude=".*bindata_assetfs\.go"
+\ --exclude="ui"
+\ --exclude="vendor"
+\ --skip="ui/"
+\ --skip="vendor/"
+\ --sort="path"
+\ --aggregate
+\ --enable-gc
+\ --enable goimports
+\ --enable misspell
+\ --enable vet
+\ --enable deadcode
+\ --enable varcheck
+\ --enable ineffassign
+\ --enable structcheck
+\ --enable unconvert
+\ --enable gas
+\ --enable gofmt
+\ ./...'
 
 " Easy-align
 vnoremap <silent> <leader>a :EasyAlign<Enter>
@@ -178,22 +204,60 @@ let g:tagbar_autofocus=1
 " Index Search
 let g:indexed_search_colors=0
 
-" Syntastic
-let g:syntastic_c_check_header = 1
-let g:syntastic_c_compiler_options = '-std=gnu99 -fno-strict-aliasing
-            \-Werror -Wall -Wno-missing-field-initializers
-            \-Wmissing-declarations -Wmissing-prototypes -Wno-format-zero-length
-            \-Wpointer-arith
-            \-Wstrict-prototypes -Wwrite-strings -Werror=unused-function'
-let g:syntastic_python_checkers = ['flake8']
-let g:syntastic_python_flake8_args = '--ignore="E501,E302,E261,E701,E241,E126,E127,E128,W801"'
-let g:syntastic_go_checkers = ['go']
-" let g:syntastic_mode_map = { 'mode': 'active', 'passive_filetypes': ['go'] }
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
+" Neomake
+function! SetTags(tags)
+    exe 'GoBuildTags ' . a:tags
+    let g:neomake_go_go_maker = {
+    \ 'args': [
+        \ 'test', '-c', '-tags', a:tags,
+        \ '-o', neomake#utils#DevNull(),
+    \ ],
+    \ 'append_file': 0,
+    \ 'cwd': '%:h',
+    \ 'serialize': 1,
+    \ 'serialize_abort_on_error': 1,
+    \ 'errorformat':
+        \ '%W%f:%l: warning: %m,' .
+        \ '%E%f:%l:%c:%m,' .
+        \ '%E%f:%l:%m,' .
+        \ '%C%\s%\+%m,' .
+        \ '%-G#%.%#'
+    \ }
+endfunction
+
+call neomake#configure#automake('w')
+let g:neomake_open_list = 2
+let g:neomake_go_gometalinter_maker = {
+  \ 'args': [
+  \  '--vendor',
+  \  '--exclude=".*\.generated\.go"',
+  \  '--exclude=".*bindata_assetfs\.go"',
+  \  '--exclude="ui"',
+  \  '--exclude="vendor"',
+  \  '--skip="ui/"',
+  \  '--skip="vendor/"',
+  \  '--sort="path"',
+  \  '--aggregate',
+  \  '--enable-gc',
+  \  '--enable goimports',
+  \  '--enable misspell',
+  \  '--enable vet',
+  \  '--enable deadcode',
+  \  '--enable varcheck',
+  \  '--enable ineffassign',
+  \  '--enable structcheck',
+  \  '--enable unconvert',
+  \  '--enable gas',
+  \  '--enable gofmt',
+  \   '%:p:h',
+  \ ],
+  \ 'append_file': 0,
+  \ 'errorformat':
+  \   '%E%f:%l:%c:%trror: %m,' .
+  \   '%W%f:%l:%c:%tarning: %m,' .
+  \   '%E%f:%l::%trror: %m,' .
+  \   '%W%f:%l::%tarning: %m'
+  \ }
 
 " NerdTree
 map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
@@ -202,98 +266,17 @@ nmap <leader>nt :NERDTreeFind<CR>
 let NERDTreeIgnore=['\.class', '\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.o']
 let NERDTreeQuitOnOpen=1
 
-" Cscope
-nmap <leader>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-set cscopetag
-
 "Deocomplete
-if has('nvim')
-    let g:deoplete#enable_at_startup = 1
-    let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
-    let g:deoplete#sources#go#use_cache = 1
-    let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/darwin_amd64'
-    set completeopt+=noinsert
-    set completeopt+=noselect
-else
-    "Neocomplete
-    let g:acp_enableAtStartup = 0
-    let g:neocomplete#enable_at_startup = 1
-    let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#enable_auto_delimiter = 1
-    let g:neocomplete#max_list = 15
-    let g:neocomplete#force_overwrite_completefunc = 1
-    " SuperTab like snippets behavior.
-    imap <silent><expr><TAB> neosnippet#expandable() ?
-                \ "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ?
-                \ "\<C-e>" : "\<TAB>")
-    smap <TAB> <Right><Plug>(neosnippet_jump_or_expand)
-    " Define dictionary.
-    let g:neocomplete#sources#dictionary#dictionaries = {
-                \ 'default' : '',
-                \ 'vimshell' : $HOME.'/.vimshell_hist',
-                \ 'scheme' : $HOME.'/.gosh_completions'
-                \ }
-    " Define keyword.
-    if !exists('g:neocomplete#keyword_patterns')
-        let g:neocomplete#keyword_patterns = {}
-    endif
-    let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-    " Plugin key-mappings.
-    " These two lines conflict with the default digraph mapping of <C-K>
-    " If you prefer that functionality, add
-    " let g:spf13_no_neosnippet_expand = 1
-    " in your .vimrc.bundles.local file
-    if !exists('g:spf13_no_neosnippet_expand')
-        imap <C-k> <Plug>(neosnippet_expand_or_jump)
-        smap <C-k> <Plug>(neosnippet_expand_or_jump)
-    endif
-    inoremap <expr><C-g> neocomplete#undo_completion()
-    inoremap <expr><C-l> neocomplete#complete_common_string()
-    inoremap <expr><CR> neocomplete#complete_common_string()
-    " <C-h>, <BS>: close popup and delete backword char.
-    inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-    inoremap <expr><C-y> neocomplete#close_popup()
-    " Enable omni completion.
-    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-    autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-    autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
-    " Haskell post write lint and check with ghcmod
-    " $ `cabal install ghcmod` if missing and ensure
-    " ~/.cabal/bin is in your $PATH.
-    if !executable("ghcmod")
-        autocmd BufWritePost *.hs GhcModCheckAndLintAsync
-    endif
-    " Enable heavy omni completion.
-    if !exists('g:neocomplete#sources#omni#input_patterns')
-        let g:neocomplete#sources#omni#input_patterns = {}
-    endif
-    let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-    let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-    let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-    let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-    let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
-    " Use honza's snippets.
-    let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
-    " Enable neosnippet snipmate compatibility mode
-    let g:neosnippet#enable_snipmate_compatibility = 1
-    " For snippet_complete marker.
-    if has('conceal')
-        set conceallevel=2 concealcursor=i
-    endif
-endif
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+let g:deoplete#sources#go#use_cache = 1
+let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/darwin_amd64'
+set completeopt+=noinsert
+set completeopt+=noselect
 
 " <TAB>: completion.
 inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
-
-" <CR>: close popup
-" <s-CR>: close popup and save indent.
-inoremap <expr><s-CR> pumvisible() ? neocomplete#close_popup()"\<CR>" : "\<CR>"
-inoremap <expr><CR> pumvisible() ? neocomplete#close_popup() : "\<CR>"
 
 " Disable the neosnippet preview candidate window
 " When enabled, there can be too much visual noise
@@ -307,3 +290,20 @@ filetype plugin indent on
 
 " HCL Syntax
 let g:hcl_fmt_autosave = 0
+
+" neosnippet
+" Plugin key-mappings.
+" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
+
+" SuperTab like snippets behavior.
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+
+" For conceal markers.
+if has('conceal')
+  set conceallevel=2 concealcursor=niv
+endif
