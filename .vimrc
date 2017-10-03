@@ -174,6 +174,7 @@ function! GoTestPassed()
     return 0
 endfunction
 
+let g:go_statusline_duration = 15000
 call airline#parts#define_function('gotestpassing', 'GoTestRes')
 call airline#parts#define_condition('gotestpassing', 'GoTestPassed()')
 call airline#parts#define_accent('gotestpassing', 'green')
