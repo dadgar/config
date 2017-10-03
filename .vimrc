@@ -157,6 +157,30 @@ set laststatus=2
 let g:airline_theme='luna'
 let g:signify_mapping_toggle_highlight = '<leader>gh'
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#neomake#enabled = 1
+
+" Airline go test run status
+function! GoTestRes()
+    let lastStatus = go#statusline#Show()
+    return lastStatus
+endfunction
+
+function! GoTestPassed()
+    let lastStatus = go#statusline#Show()
+    if lastStatus =~ "success" || lastStatus =~ "finished" || lastStatus =~ "pass"
+        return 1
+    endif
+
+    return 0
+endfunction
+
+call airline#parts#define_function('gotestpassing', 'GoTestRes')
+call airline#parts#define_condition('gotestpassing', 'GoTestPassed()')
+call airline#parts#define_accent('gotestpassing', 'green')
+call airline#parts#define_function('gotestrun', 'GoTestRes')
+call airline#parts#define_condition('gotestrun', 'GoTestPassed() == 0')
+call airline#parts#define_accent('gotestrun', 'purple')
+let g:airline_section_c = airline#section#create_right(['gotestpassing', 'gotestrun'])
 
 " Signify
 nnoremap <leader>gt :SignifyToggle<CR>
@@ -165,6 +189,8 @@ nmap <leader>gj <plug>(signify-next-hunk)
 nmap <leader>gk <plug>(signify-prev-hunk)
 
 " vim-go
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
 let g:go_def_mapping_enabled = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
