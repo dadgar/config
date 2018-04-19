@@ -1,5 +1,5 @@
 source ~/.config/liquidpromptrc
-source ~/liquidprompt/liquidprompt
+[[ $- = *i* ]] && source ~/liquidprompt/liquidprompt
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 export CLICOLOR=1;
@@ -49,8 +49,6 @@ shopt -s histappend              # append new history items to .bash_history
 export HISTCONTROL=ignorespace   # leading space hides commands from history
 export HISTFILESIZE=10000        # increase history file size (default is 500)
 export HISTSIZE=${HISTFILESIZE}  # increase history size (default is 500)
-export PROMPT_COMMAND="history -a; history -n; ${PROMPT_COMMAND}"   # mem/file sync
 if [[ $- =~ .*i.* ]]; then bind '"\C-r": "\C-a hh -- \C-j"'; fi
 
-test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
 source ~/.bashrc
