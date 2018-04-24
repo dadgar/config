@@ -41,6 +41,7 @@ Plugin 'Shougo/neosnippet'
 Plugin 'Shougo/neosnippet-snippets'
 Plugin 'neomake/neomake'
 Plugin 'gabesoft/vim-ags'
+Plugin 'ludovicchabant/vim-gutentags'
 
 " Colors
 Plugin 'ayu-theme/ayu-vim'
@@ -142,6 +143,10 @@ endif
 set history=10000
 set undolevels=1000
 
+" Ctags
+let g:gutentags_ctags_tagfile="tags"
+let g:gutentags_ctags_exclude=["vendor/*", "ui/*", "demo/*", "terraform/*"]
+
 " Ag
 let g:ag_working_path_mode="r"
 
@@ -150,6 +155,7 @@ set wildignore+=*/ui
 let g:ctrlp_extensions = ['tag', 'buffertag', 'undo', 'changes']
 map <C-p> :CtrlP<Enter>
 map <C-b> :CtrlPBuffer<Enter>
+map <C-s> :CtrlPTag<Enter>
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\v[\/]vendor$',
   \ }
@@ -229,6 +235,33 @@ vnoremap <silent> <leader>a :EasyAlign<Enter>
 nnoremap <silent> <leader>tt :TagbarToggle<CR>
 let g:tagbar_autoclose=1
 let g:tagbar_autofocus=1
+let g:tagbar_type_go = {
+	\ 'ctagstype' : 'go',
+	\ 'kinds'     : [
+		\ 'p:package',
+		\ 'i:imports:1',
+		\ 'c:constants',
+		\ 'v:variables',
+		\ 't:types',
+		\ 'n:interfaces',
+		\ 'w:fields',
+		\ 'e:embedded',
+		\ 'm:methods',
+		\ 'r:constructor',
+		\ 'f:functions'
+	\ ],
+	\ 'sro' : '.',
+	\ 'kind2scope' : {
+		\ 't' : 'ctype',
+		\ 'n' : 'ntype'
+	\ },
+	\ 'scope2kind' : {
+		\ 'ctype' : 't',
+		\ 'ntype' : 'n'
+	\ },
+	\ 'ctagsbin'  : 'gotags',
+	\ 'ctagsargs' : '-sort -silent'
+\ }
 
 " Index Search
 let g:indexed_search_colors=0
