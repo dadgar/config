@@ -48,11 +48,11 @@ Plugin 'autozimu/LanguageClient-neovim', {
     \ }
 Plugin 'ncm2/ncm2'
 Plugin 'roxma/nvim-yarp'
-Plugin 'ncm2/ncm2-go'
+" Plugin 'ncm2/ncm2-go'
 Plugin 'ncm2/ncm2-bufword'
 Plugin 'ncm2/ncm2-path'
 Plugin 'ncm2/ncm2-syntax'  | Plugin 'Shougo/neco-syntax'
-Plugin 'wellle/tmux-complete.vim'
+" Plugin 'wellle/tmux-complete.vim'
 Plugin 'ncm2/ncm2-ultisnips'
 Plugin 'SirVer/ultisnips'
 
@@ -328,6 +328,7 @@ set completeopt-=preview
 
 " enable ncm2 for all buffers
 autocmd BufEnter * call ncm2#enable_for_buffer()
+au TextChangedI * call ncm2#auto_trigger()
 set completeopt=noinsert,menuone,noselect
 		
  " c-j c-k for moving in snippet
@@ -336,6 +337,21 @@ let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
 let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
 let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
 let g:UltiSnipsRemoveSelectModeMappings = 0
+
+" LSP
+" Required for operations modifying multiple buffers like rename.
+set hidden
+let g:LanguageClient_serverCommands = {
+    \ 'go': ['go-langserver', '-trace'],
+    \ }
+" a json file with settings for go-langserver:
+" {
+" 	"initializationOptions": {
+" 		"gocodeCompletionEnabled": true,
+" 		"funcSnippetEnabled": true
+" 	}
+" }
+let g:LanguageClient_settingsPath = '~/.vim/settings.json'
 
 " GO Syntax
 filetype plugin indent off
