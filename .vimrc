@@ -41,7 +41,20 @@ Plugin 'Shougo/neosnippet'
 Plugin 'Shougo/neosnippet-snippets'
 Plugin 'neomake/neomake'
 Plugin 'gabesoft/vim-ags'
-Plugin 'ludovicchabant/vim-gutentags'
+Plugin 'mdempsky/gocode', {'rtp': 'nvim/'}
+Plugin 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+Plugin 'ncm2/ncm2'
+Plugin 'roxma/nvim-yarp'
+Plugin 'ncm2/ncm2-go'
+Plugin 'ncm2/ncm2-bufword'
+Plugin 'ncm2/ncm2-path'
+Plugin 'ncm2/ncm2-syntax'  | Plugin 'Shougo/neco-syntax'
+Plugin 'wellle/tmux-complete.vim'
+Plugin 'ncm2/ncm2-ultisnips'
+Plugin 'SirVer/ultisnips'
 
 " Colors
 Plugin 'ayu-theme/ayu-vim'
@@ -129,6 +142,9 @@ set backspace=2
 set ttyfast
 set lazyredraw
 
+" Use system clipboard
+set clipboard=unnamed
+
 " Default to 2 spaces per tab
 set tabstop=4
 set softtabstop=4
@@ -142,10 +158,6 @@ endif
 " More history
 set history=10000
 set undolevels=1000
-
-" Ctags
-let g:gutentags_ctags_tagfile="tags"
-let g:gutentags_ctags_exclude=["vendor/*", "ui/*", "demo/*", "terraform/*"]
 
 " Ag
 let g:ag_working_path_mode="r"
@@ -216,16 +228,15 @@ let g:go_metalinter_command = 'gometalinter
 \ --sort="path"
 \ --aggregate
 \ --enable-gc
-\ --enable goimports
-\ --enable misspell
-\ --enable vet
-\ --enable deadcode
-\ --enable varcheck
-\ --enable ineffassign
-\ --enable structcheck
-\ --enable unconvert
-\ --enable gas
-\ --enable gofmt
+\ --enable=goimports
+\ --enable=misspell
+\ --enable=vet
+\ --enable=deadcode
+\ --enable=varcheck
+\ --enable=ineffassign
+\ --enable=structcheck
+\ --enable=unconvert
+\ --enable=gofmt
 \ ./...'
 
 " Easy-align
@@ -289,37 +300,7 @@ endfunction
 
 call neomake#configure#automake('w')
 let g:neomake_open_list = 2
-let g:neomake_go_gometalinter_maker = {
-  \ 'args': [
-  \  '--vendor',
-  \  '--exclude=".*\.generated\.go"',
-  \  '--exclude=".*bindata_assetfs\.go"',
-  \  '--exclude="ui"',
-  \  '--exclude="vendor"',
-  \  '--skip="ui/"',
-  \  '--skip="vendor/"',
-  \  '--sort="path"',
-  \  '--aggregate',
-  \  '--enable-gc',
-  \  '--enable goimports',
-  \  '--enable misspell',
-  \  '--enable vet',
-  \  '--enable deadcode',
-  \  '--enable varcheck',
-  \  '--enable ineffassign',
-  \  '--enable structcheck',
-  \  '--enable unconvert',
-  \  '--enable gas',
-  \  '--enable gofmt',
-  \   '%:p:h',
-  \ ],
-  \ 'append_file': 0,
-  \ 'errorformat':
-  \   '%E%f:%l:%c:%trror: %m,' .
-  \   '%W%f:%l:%c:%tarning: %m,' .
-  \   '%E%f:%l::%trror: %m,' .
-  \   '%W%f:%l::%tarning: %m'
-  \ }
+let g:neomake_go_enabled_makers = ['go']
 
 " NerdTree
 map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
@@ -329,7 +310,7 @@ let NERDTreeIgnore=['\.class', '\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.h
 let NERDTreeQuitOnOpen=1
 
 "Deocomplete
-let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_at_startup = 0
 let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 let g:deoplete#sources#go#use_cache = 1
 let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/darwin_amd64'
@@ -344,6 +325,17 @@ inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
 " When enabled, there can be too much visual noise
 " especially when splits are used.
 set completeopt-=preview
+
+" enable ncm2 for all buffers
+autocmd BufEnter * call ncm2#enable_for_buffer()
+set completeopt=noinsert,menuone,noselect
+		
+ " c-j c-k for moving in snippet
+inoremap <silent> <expr> <CR> pumvisible() ? ncm2_ultisnips#expand_or("\<CR>", 'n') : "\<CR>"
+let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
+let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
+let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
+let g:UltiSnipsRemoveSelectModeMappings = 0
 
 " GO Syntax
 filetype plugin indent off
