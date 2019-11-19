@@ -2,67 +2,60 @@ set nocompatible
 filetype off
 let mapleader=","
 set t_Co=256
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" let Vundle manage Vundle
-" required!
-Plugin 'VundleVim/Vundle.vim'
-" My Bundles
-Plugin 'scrooloose/nerdtree'
-Plugin 'majutsushi/tagbar'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'bling/vim-airline'
-Plugin 'simnalamburt/vim-mundo'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'godlygeek/tabular'
-Plugin 'junegunn/vim-easy-align'
-Plugin 'Lokaltog/vim-easymotion'
-Plugin 'justinmk/vim-sneak'
-Plugin 'kien/ctrlp.vim'
-Plugin 'dantler/vim-alternate'
-Plugin 'vim-scripts/Figlet.vim'
-Plugin 'rking/ag.vim'
-Plugin 'mhinz/vim-signify'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-rhubarb'
-Plugin 'kshenoy/vim-signature'
-Plugin 'fatih/vim-go'
-Plugin 'leshill/vim-json'
-Plugin 'moll/vim-bbye'
-Plugin 'henrik/vim-indexed-search'
-Plugin 'Shougo/deoplete.nvim'
-Plugin 'zchee/deoplete-go', { 'do': 'make'}
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'shime/vim-livedown'
-Plugin 'junegunn/goyo.vim'
-Plugin 'fatih/vim-hclfmt'
-Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plugin 'Shougo/neosnippet'
-Plugin 'Shougo/neosnippet-snippets'
-Plugin 'neomake/neomake'
-Plugin 'gabesoft/vim-ags'
-Plugin 'mdempsky/gocode', {'rtp': 'nvim/'}
-Plugin 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
-Plugin 'ncm2/ncm2'
-Plugin 'roxma/nvim-yarp'
-" Plugin 'ncm2/ncm2-go'
-Plugin 'ncm2/ncm2-bufword'
-Plugin 'ncm2/ncm2-path'
-Plugin 'ncm2/ncm2-syntax'  | Plugin 'Shougo/neco-syntax'
-" Plugin 'wellle/tmux-complete.vim'
-Plugin 'ncm2/ncm2-ultisnips'
-Plugin 'SirVer/ultisnips'
+
+call plug#begin('~/.vim/plugged')
+Plug 'scrooloose/nerdtree'
+Plug 'majutsushi/tagbar'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'bling/vim-airline'
+Plug 'simnalamburt/vim-mundo'
+Plug 'scrooloose/nerdcommenter'
+Plug 'godlygeek/tabular'
+Plug 'junegunn/vim-easy-align'
+Plug 'Lokaltog/vim-easymotion'
+Plug 'justinmk/vim-sneak'
+Plug 'kien/ctrlp.vim'
+Plug 'dantler/vim-alternate'
+Plug 'vim-scripts/Figlet.vim'
+Plug 'rking/ag.vim'
+Plug 'mhinz/vim-signify'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+Plug 'kshenoy/vim-signature'
+Plug 'fatih/vim-go'
+Plug 'leshill/vim-json'
+Plug 'moll/vim-bbye'
+Plug 'henrik/vim-indexed-search'
+Plug 'Shougo/deoplete.nvim'
+Plug 'zchee/deoplete-go', { 'do': 'make'}
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'shime/vim-livedown'
+Plug 'junegunn/goyo.vim'
+Plug 'fatih/vim-hclfmt'
+Plug 'gabesoft/vim-ags'
+"Plugin 'neomake/neomake'
+"Plugin 'mdempsky/gocode', {'rtp': 'nvim/'}
+
+"Plug 'autozimu/LanguageClient-neovim', {
+    "\ 'branch': 'next',
+    "\ 'do': 'bash install.sh',
+    "\ }
+"Plug 'ncm2/ncm2'
+"Plug 'roxma/nvim-yarp'
+"Plug 'ncm2/ncm2-go'
+"Plug 'ncm2/ncm2-bufword'
+"Plug 'ncm2/ncm2-path'
+"Plug 'ncm2/ncm2-syntax'  | Plug 'Shougo/neco-syntax'
+
+" Autocomplete
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 
 " Colors
-Plugin 'ayu-theme/ayu-vim'
-Plugin 'dadgar/vim-luna'
-Plugin 'chriskempson/tomorrow-theme', {'rtp': 'vim/'}
+Plug 'ayu-theme/ayu-vim'
+Plug 'dadgar/vim-luna'
+Plug 'chriskempson/tomorrow-theme', {'rtp': 'vim/'}
 
-call vundle#end()            " required
-filetype plugin indent on    " required
+call plug#end()
 
 " gui colors if running iTerm
 if $TERM_PROGRAM =~ "iTerm"
@@ -159,6 +152,9 @@ endif
 set history=10000
 set undolevels=1000
 
+" Clear whitespace at the end of lines automatically
+autocmd BufWritePre * :%s/\s\+$//e
+
 " Ag
 let g:ag_working_path_mode="r"
 
@@ -210,12 +206,16 @@ nmap <leader>gj <plug>(signify-next-hunk)
 nmap <leader>gk <plug>(signify-prev-hunk)
 
 " vim-go
+" Using CoC
+let g:go_code_completion_enabled = 0
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
+let g:go_def_mode = 'gopls'
+let g:go_info_mode = 'gopls'
 let g:go_def_mapping_enabled = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
-let g:go_snippet_engine = "neosnippet"
+" let g:go_snippet_engine = "neosnippet"
 let g:go_metalinter_deadline = "30s"
 let g:go_metalinter_command = 'gometalinter
 \ --vendor
@@ -277,81 +277,12 @@ let g:tagbar_type_go = {
 " Index Search
 let g:indexed_search_colors=0
 
-" Neomake
-function! SetTags(tags)
-    exe 'GoBuildTags ' . a:tags
-    let g:neomake_go_go_maker = {
-    \ 'args': [
-        \ 'test', '-c', '-tags', a:tags,
-        \ '-o', neomake#utils#DevNull(),
-    \ ],
-    \ 'append_file': 0,
-    \ 'cwd': '%:h',
-    \ 'serialize': 1,
-    \ 'serialize_abort_on_error': 1,
-    \ 'errorformat':
-        \ '%W%f:%l: warning: %m,' .
-        \ '%E%f:%l:%c:%m,' .
-        \ '%E%f:%l:%m,' .
-        \ '%C%\s%\+%m,' .
-        \ '%-G#%.%#'
-    \ }
-endfunction
-
-call neomake#configure#automake('w')
-let g:neomake_open_list = 2
-let g:neomake_go_enabled_makers = ['go']
-
 " NerdTree
 map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
 map <leader>e :NERDTreeFind<CR>
 nmap <leader>nt :NERDTreeFind<CR>
 let NERDTreeIgnore=['\.class', '\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr', '\.o']
 let NERDTreeQuitOnOpen=1
-
-"Deocomplete
-let g:deoplete#enable_at_startup = 0
-let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
-let g:deoplete#sources#go#use_cache = 1
-let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/darwin_amd64'
-set completeopt+=noinsert
-set completeopt+=noselect
-
-" <TAB>: completion.
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
-
-" Disable the neosnippet preview candidate window
-" When enabled, there can be too much visual noise
-" especially when splits are used.
-set completeopt-=preview
-
-" enable ncm2 for all buffers
-autocmd BufEnter * call ncm2#enable_for_buffer()
-au TextChangedI * call ncm2#auto_trigger()
-set completeopt=noinsert,menuone,noselect
-		
- " c-j c-k for moving in snippet
-inoremap <silent> <expr> <CR> pumvisible() ? ncm2_ultisnips#expand_or("\<CR>", 'n') : "\<CR>"
-let g:UltiSnipsExpandTrigger		= "<Plug>(ultisnips_expand)"
-let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
-let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
-let g:UltiSnipsRemoveSelectModeMappings = 0
-
-" LSP
-" Required for operations modifying multiple buffers like rename.
-set hidden
-let g:LanguageClient_serverCommands = {
-    \ 'go': ['go-langserver', '-trace'],
-    \ }
-" a json file with settings for go-langserver:
-" {
-" 	"initializationOptions": {
-" 		"gocodeCompletionEnabled": true,
-" 		"funcSnippetEnabled": true
-" 	}
-" }
-let g:LanguageClient_settingsPath = '~/.vim/settings.json'
 
 " GO Syntax
 filetype plugin indent off
@@ -361,19 +292,154 @@ filetype plugin indent on
 " HCL Syntax
 let g:hcl_fmt_autosave = 0
 
-" neosnippet
-" Plugin key-mappings.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
+" Neomake
+"call neomake#configure#automake('w')
+"let g:neomake_open_list = 2
+"let g:neomake_go_enabled_makers = ['go']
 
-" SuperTab like snippets behavior.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+"Deocomplete
+"let g:deoplete#enable_at_startup = 0
+"let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+"let g:deoplete#sources#go#use_cache = 1
+"let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/darwin_amd64'
 
-" For conceal markers.
-if has('conceal')
-  set conceallevel=2 concealcursor=niv
-endif
+"set completeopt+=noinsert
+"set completeopt+=noselect
+
+"" <TAB>: completion.
+"inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
+
+""Disable the neosnippet preview candidate window
+""When enabled, there can be too much visual noise
+""especially when splits are used.
+"set completeopt-=preview
+
+ ""enable ncm2 for all buffers
+"autocmd BufEnter * call ncm2#enable_for_buffer()
+"au TextChangedI * call ncm2#auto_trigger()
+"set completeopt=noinsert,menuone,noselect
+
+ ""LSP
+ ""Required for operations modifying multiple buffers like rename.
+"set hidden
+"let g:LanguageClient_serverCommands = {
+    "\ 'go': ['go-langserver'],
+    "\ }
+"" a json file with settings for go-langserver:
+"" {
+"" 	"initializationOptions": {
+"" 		"gocodeCompletionEnabled": true,
+"" 		"funcSnippetEnabled": true
+"" 	}
+"" }
+"let g:LanguageClient_settingsPath = '~/.vim/settings.json'
+"nnoremap <silent> <leader>c :call LanguageClient_contextMenu()<CR>
+"nnoremap <silent> <leader>h :call LanguageClient_textDocument_hover()<CR>
+
+
+" COC
+ "if hidden is not set, TextEdit might fail.
+set hidden
+
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=300
+
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+
+" always show signcolumns
+set signcolumn=yes
+
+"" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-r> for trigger completion.
+inoremap <silent><expr> <c-r> coc#refresh()
+
+" Use <cr> for confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Use `[c` and `]c` for navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+
+" Use K for show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+"vmap <leader>a  <Plug>(coc-codeaction-selected)
+"nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>c  <Plug>(coc-codeaction)
+
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Use `:Format` for format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` for fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+
+" Add diagnostic info for airline
+let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
+let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
+
+" Using CocList
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
