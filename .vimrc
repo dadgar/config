@@ -49,14 +49,20 @@ Plug 'hrsh7th/vim-vsnip-integ'
 Plug 'ayu-theme/ayu-vim'
 Plug 'dadgar/vim-luna'
 Plug 'chriskempson/tomorrow-theme', {'rtp': 'vim/'}
-Plug 'sheerun/vim-polyglot'
+"Plug 'sheerun/vim-polyglot'
+Plug 'sainnhe/edge'
+Plug 'sainnhe/sonokai'
+
+" Treesitter
+Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/completion-treesitter'
 
 call plug#end()
 
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
-if (empty($TMUX))
+"if (empty($TMUX))
   if (has("nvim"))
     "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
     let $NVIM_TUI_ENABLE_TRUE_COLOR=1
@@ -67,9 +73,12 @@ if (empty($TMUX))
   if (has("termguicolors"))
     set termguicolors
   endif
-endif
+"endif
 
-colorscheme Tomorrow-Night-Eighties
+" Colorscheme
+let g:sonokai_style = 'maia'
+let g:sonokai_enable_italic = 1
+colorscheme sonokai
 
 " Disable arrows
 noremap <Up> <NOP>
@@ -381,4 +390,18 @@ nvim_lsp.gopls.setup{
   }
 }
 
+EOF
+
+" Treesitter highligting
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "all",
+  highlight = {
+    enable = true,
+  },
+  refactor = {
+    highlight_definitions = { enable = true },
+    highlight_current_scope = { enable = true },
+  },
+}
 EOF
