@@ -31,21 +31,9 @@ Plug 'zchee/deoplete-go', { 'do': 'make'}
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'shime/vim-livedown'
 Plug 'junegunn/goyo.vim'
-Plug 'fatih/vim-hclfmt'
 Plug 'gabesoft/vim-ags'
-"Plugin 'neomake/neomake'
-"Plugin 'mdempsky/gocode', {'rtp': 'nvim/'}
-
-"Plug 'autozimu/LanguageClient-neovim', {
-    "\ 'branch': 'next',
-    "\ 'do': 'bash install.sh',
-    "\ }
-"Plug 'ncm2/ncm2'
-"Plug 'roxma/nvim-yarp'
-"Plug 'ncm2/ncm2-go'
-"Plug 'ncm2/ncm2-bufword'
-"Plug 'ncm2/ncm2-path'
-"Plug 'ncm2/ncm2-syntax'  | Plug 'Shougo/neco-syntax'
+Plug 'pechorin/any-jump.vim'
+Plug 'camspiers/lens.vim'
 
 " Autocomplete
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
@@ -54,12 +42,24 @@ Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 Plug 'ayu-theme/ayu-vim'
 Plug 'dadgar/vim-luna'
 Plug 'chriskempson/tomorrow-theme', {'rtp': 'vim/'}
+Plug 'sheerun/vim-polyglot'
 
 call plug#end()
 
-" gui colors if running iTerm
-if $TERM_PROGRAM =~ "iTerm"
-  set termguicolors
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+if (empty($TMUX))
+  if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
 endif
 
 colorscheme Tomorrow-Night-Eighties
@@ -292,51 +292,11 @@ filetype plugin indent on
 " HCL Syntax
 let g:hcl_fmt_autosave = 0
 
-" Neomake
-"call neomake#configure#automake('w')
-"let g:neomake_open_list = 2
-"let g:neomake_go_enabled_makers = ['go']
-
-"Deocomplete
-"let g:deoplete#enable_at_startup = 0
-"let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
-"let g:deoplete#sources#go#use_cache = 1
-"let g:deoplete#sources#go#json_directory = '~/.cache/deoplete/go/darwin_amd64'
-
-"set completeopt+=noinsert
-"set completeopt+=noselect
-
-"" <TAB>: completion.
-"inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
-
-""Disable the neosnippet preview candidate window
-""When enabled, there can be too much visual noise
-""especially when splits are used.
-"set completeopt-=preview
-
- ""enable ncm2 for all buffers
-"autocmd BufEnter * call ncm2#enable_for_buffer()
-"au TextChangedI * call ncm2#auto_trigger()
-"set completeopt=noinsert,menuone,noselect
-
- ""LSP
- ""Required for operations modifying multiple buffers like rename.
-"set hidden
-"let g:LanguageClient_serverCommands = {
-    "\ 'go': ['go-langserver'],
-    "\ }
-"" a json file with settings for go-langserver:
-"" {
-"" 	"initializationOptions": {
-"" 		"gocodeCompletionEnabled": true,
-"" 		"funcSnippetEnabled": true
-"" 	}
-"" }
-"let g:LanguageClient_settingsPath = '~/.vim/settings.json'
-"nnoremap <silent> <leader>c :call LanguageClient_contextMenu()<CR>
-"nnoremap <silent> <leader>h :call LanguageClient_textDocument_hover()<CR>
-
+" Lens
+let g:lens#width_resize_max  = 120
+let g:lens#width_resize_min = 60
+let g:lens#height_resize_max = 50
+let g:lens#height_resize_min = 20
 
 " COC
  "if hidden is not set, TextEdit might fail.
@@ -383,11 +343,11 @@ nmap <silent> gr <Plug>(coc-references)
 
 autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 
-" Use K for show documentation in preview window
+" Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if &filetype == 'vim'
+  if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   else
     call CocAction('doHover')
@@ -396,6 +356,7 @@ endfunction
 
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
+autocmd CursorHold * silent call CocActionAsync('showSignatureHelp')
 
 
 " Remap for rename current word
@@ -421,6 +382,9 @@ command! -nargs=0 Format :call CocAction('format')
 " Use `:Fold` for fold current buffer
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
+" Use <TAB> for selections ranges.
+nmap <silent> <TAB> <Plug>(coc-range-select)
+xmap <silent> <TAB> <Plug>(coc-range-select)
 
 " Add diagnostic info for airline
 let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
@@ -443,3 +407,5 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+
