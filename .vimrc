@@ -33,13 +33,11 @@ Plug 'shime/vim-livedown'
 Plug 'junegunn/goyo.vim'
 Plug 'gabesoft/vim-ags'
 Plug 'pechorin/any-jump.vim'
-Plug 'camspiers/lens.vim'
 
 " LSP
 Plug 'neovim/nvim-lsp'
 Plug 'nvim-lua/completion-nvim'
 Plug 'nvim-lua/lsp-status.nvim'
-Plug 'nvim-lua/diagnostic-nvim'
 
 " Snippets
 Plug 'hrsh7th/vim-vsnip'
@@ -59,6 +57,10 @@ Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'nvim-treesitter/completion-treesitter'
 
 call plug#end()
+
+" Light colorscheme
+let ayucolor="light"
+colorscheme ayu
 
 " Colorscheme
 set termguicolors
@@ -296,11 +298,6 @@ set completeopt=menuone,noinsert,noselect
 " Avoid showing message extra message when using completion
 set shortmess+=c
 
-" Diagnostic settings
-let g:diagnostic_insert_delay = 1
-let g:diagnostic_show_sign = 1
-let g:diagnostic_enable_virtual_text = 1
-
 " Snippets
 let g:completion_enable_snippet = 'vim-vsnip'
 
@@ -330,15 +327,11 @@ smap        S   <Plug>(vsnip-cut-text)
 " LSP
 lua << EOF
 local lsp_status = require('lsp-status')
-local diagnostic = require('diagnostic')
 local completion = require('completion')
-local nvim_lsp = require('nvim_lsp')
-local configs = require('nvim_lsp/configs')
-local util = require('nvim_lsp/util')
+local configs = require('lspconfig')
 
 local on_attach = function(client, bufnr)
   lsp_status.on_attach(client, bufnr)
-  diagnostic.on_attach(client, bufnr)
   completion.on_attach(client, bufnr)
 
   -- Keybindings for LSPs
@@ -364,24 +357,32 @@ lsp_status.config({
   indicator_ok = 'ok',
 })
 
-nvim_lsp.gopls.setup{
+configs.gopls.setup{
   on_attach = on_attach,
   capabilities = lsp_status.capabilities,
   settings = {
     gopls = {
       usePlaceholders = true,
-      codelens = {
+      codelenses = {
         upgrade_dependency = true,
         test = true
-      }
+      },
+      experimentalWorkspaceModule = true
     }
   }
 }
 
-nvim_lsp.jsonls.setup{
+configs.jsonls.setup{
   on_attach = on_attach,
   capabilities = lsp_status.capabilities,
 }
+
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    signs = true,
+    update_in_insert = false,
+  }
+)
 
 EOF
 
