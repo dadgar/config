@@ -1,32 +1,39 @@
 [user]
 	email = alex.dadgar@gmail.com
 	name = Alex Dadgar
+
 [color]
 	ui = true
+
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
+
 [core]
 	editor = nvim
-	excludesfile = /Users/adadgar/.gitignore_global
+	excludesfile = /Users/alexdadgar/.config/git/ignore
+    pager = delta
+
 [push]
 	default = simple
+
 [credential]
 	helper = osxkeychain
+
 [filter "lfs"]
 	clean = git-lfs clean %f
 	smudge = git-lfs smudge %f
 	required = true
-[color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
-[pager]
-	diff = diff-so-fancy | less --tabs=1,5 -RFX
-	show = diff-so-fancy | less --tabs=1,5 -RFX
-[difftool "meld"]
-  trustExitCode = true
-  cmd = open -W -a Meld --args \"$LOCAL\" \"$REMOTE\"
-[mergetool "meld"]
-  trustExitCode = true
-  cmd = open -W -a Meld --args --auto-merge \"$LOCAL\" \"$BASE\" \"$REMOTE\" --output=\"$MERGED\"
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true  # use n and N to move between diff sections
+    side-by-side = true
+    theme = Monokai Extended Bright
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
