@@ -35,5 +35,24 @@
 [merge]
     conflictstyle = diff3
 
+[submodule]
+    recurse = true
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+
 [diff]
     colorMoved = default
+	external = difft
+
+[difftool]
+	prompt = false
+
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+
+[pager]
+	difftool = true
+
+[alias]
+	dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff $@; }; f"
